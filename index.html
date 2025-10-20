@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js 3D City Block</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #f0f0f0; font-family: sans-serif; }
+        canvas { display: block; }
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .ui-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin-left: 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .ui-button:hover {
+            background-color: #45a049;
+        }
+        #switchCarButton {
+            background-color: #2196F3;
+        }
+        #switchCarButton:hover {
+            background-color: #1976D2;
+        }
+        #viewStatus {
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+    <!-- Three.js Library --><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls for camera interaction --><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- GLTFLoader for loading 3D models --><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+    <div id="ui">
+        <span id="viewStatus">View: Overhead</span>
+        <button id="toggleButton" class="ui-button">Switch to Car Cam</button>
+        <button id="switchCarButton" class="ui-button">Switch Car</button>
+    </div>
+    <script src="roads.js"></script>
+    <script src="buildings.js"></script>
+    <script src="vehicles.js"></script>
+    <script src="city.js"></script>
+</body>
+</html>
