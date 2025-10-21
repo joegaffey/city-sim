@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D City</title>
+    <title>Three.js 3D City Block</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #f0f0f0; font-family: sans-serif; }
         canvas { display: block; }
@@ -17,6 +17,8 @@
             border-radius: 8px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .ui-button {
@@ -28,7 +30,6 @@
             text-decoration: none;
             display: inline-block;
             font-size: 14px;
-            margin-left: 15px;
             cursor: pointer;
             border-radius: 4px;
             transition: background-color 0.3s;
@@ -53,7 +54,6 @@
 </head>
 <body>
     <div id="ui">
-        <span id="viewStatus">View: Overhead</span>
         <button id="toggleButton" class="ui-button">Switch to Car Cam</button>
         <button id="switchCarButton" class="ui-button">Switch Car</button>
     </div>
@@ -63,4 +63,3 @@
     <script src="city.js"></script>
 </body>
 </html>
-
