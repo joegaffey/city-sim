@@ -34,13 +34,11 @@ function toggleCameraView() {
     isFirstPerson = !isFirstPerson;
     
     const button = document.getElementById('toggleButton');
-    const status = document.getElementById('viewStatus');
 
     if (isFirstPerson) {
         // Switch to first-person
         controls.enabled = false;
         button.textContent = "Switch to Overhead";
-        status.textContent = "View: Car Cam";
         // Ensure a car is active when entering first-person
         if (activeCarIndex === -1 && cars.length > 0) {
             switchCarCamera();
@@ -49,11 +47,14 @@ function toggleCameraView() {
         document.addEventListener('mousedown', onMouseDown);
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
+        // Add touch event listeners for mobile
+        document.addEventListener('touchstart', onMouseDown);
+        document.addEventListener('touchmove', onTouchMove);
+        document.addEventListener('touchend', onMouseUp);
     } else {
         // Switch back to overhead
         controls.enabled = true;
         button.textContent = "Switch to Car Cam";
-        status.textContent = "View: Overhead";
         
         // Reset camera position to a decent overview when returning to controls
         camera.position.set(gridSize * 0.8, gridSize * 0.8, gridSize * 0.8);
@@ -63,6 +64,10 @@ function toggleCameraView() {
         document.removeEventListener('mousedown', onMouseDown);
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
+        // Remove touch event listeners
+        document.removeEventListener('touchstart', onMouseDown);
+        document.removeEventListener('touchmove', onTouchMove);
+        document.removeEventListener('touchend', onMouseUp);
         // Reset camera rotation
         cameraRotationX = 0;
         cameraRotationY = 0;
@@ -318,16 +323,33 @@ function updateCars() {
  */
 function onMouseDown(event) {
     if (!isFirstPerson) return;
+    event.preventDefault();
     isDragging = true;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
+    
+    if (event.touches && event.touches.length > 0) {
+        mouseX = event.touches[0].clientX;
+        mouseY = event.touches[0].clientY;
+    } else {
+        mouseX = event.clientX || 0;
+        mouseY = event.clientY || 0;
+    }
 }
 
 function onMouseMove(event) {
     if (!isFirstPerson || !isDragging) return;
+    event.preventDefault();
     
-    const deltaX = event.clientX - mouseX;
-    const deltaY = event.clientY - mouseY;
+    let clientX, clientY;
+    if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else {
+        clientX = event.clientX || mouseX;
+        clientY = event.clientY || mouseY;
+    }
+    
+    const deltaX = clientX - mouseX;
+    const deltaY = clientY - mouseY;
     
     targetRotationY += deltaX * 0.005;
     targetRotationX += deltaY * 0.005;
@@ -335,8 +357,8 @@ function onMouseMove(event) {
     // Limit vertical rotation
     targetRotationX = Math.max(-Math.PI/4, Math.min(Math.PI/4, targetRotationX));
     
-    mouseX = event.clientX;
-    mouseY = event.clientY;
+    mouseX = clientX;
+    mouseY = clientY;
 }
 
 function onMouseUp(event) {
@@ -345,6 +367,24 @@ function onMouseUp(event) {
     // Return to center
     targetRotationX = 0;
     targetRotationY = 0;
+}
+
+function onTouchMove(event) {
+    if (!isFirstPerson || !isDragging) return;
+    event.preventDefault();
+    
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - mouseX;
+    const deltaY = touch.clientY - mouseY;
+    
+    targetRotationY += deltaX * 0.005;
+    targetRotationX += deltaY * 0.005;
+    
+    // Limit vertical rotation
+    targetRotationX = Math.max(-Math.PI/4, Math.min(Math.PI/4, targetRotationX));
+    
+    mouseX = touch.clientX;
+    mouseY = touch.clientY;
 }
 
 /**
@@ -357,8 +397,8 @@ function updateCarCamera() {
     const direction = cars[activeCarIndex].direction;
     
     // Smoothly interpolate camera rotation
-    cameraRotationX += (targetRotationX - cameraRotationX) * 0.1;
-    cameraRotationY += (targetRotationY - cameraRotationY) * 0.1;
+    cameraRotationX += (targetRotationX - cameraRotationX) * 0.3;
+    cameraRotationY += (targetRotationY - cameraRotationY) * 0.3;
     
     // 1. Position the camera slightly behind and above the car
     const cameraOffset = new THREE.Vector3().copy(direction).negate().multiplyScalar(5);
