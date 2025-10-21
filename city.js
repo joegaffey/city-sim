@@ -79,6 +79,14 @@ function init() {
     document.getElementById('toggleButton').addEventListener('click', toggleCameraView);
     document.getElementById('switchCarButton').addEventListener('click', switchCarCamera);
     
+    // Car camera mouse controls
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchstart', handleMouseDown);
+    document.addEventListener('touchmove', handleMouseMove);
+    document.addEventListener('touchend', handleMouseUp);
+    
     // Start the animation loop
     animate();
 }
@@ -90,10 +98,9 @@ function animate() {
     requestAnimationFrame(animate);
 
     updateCars(); 
+    updateCarCamera();
     
-    if (isFirstPerson) {
-        updateCarCamera();
-    } else {
+    if (!isFirstPerson) {
         controls.update(); 
     }
     

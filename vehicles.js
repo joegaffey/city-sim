@@ -43,14 +43,6 @@ function toggleCameraView() {
         if (activeCarIndex === -1 && cars.length > 0) {
             switchCarCamera();
         }
-        // Add mouse event listeners for car camera
-        document.addEventListener('mousedown', onMouseDown);
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-        // Add touch event listeners for mobile
-        document.addEventListener('touchstart', onMouseDown);
-        document.addEventListener('touchmove', onTouchMove);
-        document.addEventListener('touchend', onMouseUp);
     } else {
         // Switch back to overhead
         controls.enabled = true;
@@ -60,19 +52,12 @@ function toggleCameraView() {
         camera.position.set(gridSize * 0.8, gridSize * 0.8, gridSize * 0.8);
         controls.target.set(0, 0, 0); 
         controls.update();
-        // Remove mouse event listeners
-        document.removeEventListener('mousedown', onMouseDown);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        // Remove touch event listeners
-        document.removeEventListener('touchstart', onMouseDown);
-        document.removeEventListener('touchmove', onTouchMove);
-        document.removeEventListener('touchend', onMouseUp);
         // Reset camera rotation
         cameraRotationX = 0;
         cameraRotationY = 0;
         targetRotationX = 0;
-        targetRotationY = 0; 
+        targetRotationY = 0;
+        isDragging = false;
     }
 }
 
@@ -321,31 +306,30 @@ function updateCars() {
 /**
  * Mouse event handlers for car camera rotation
  */
-function onMouseDown(event) {
+function handleMouseDown(event) {
     if (!isFirstPerson) return;
-    event.preventDefault();
     isDragging = true;
     
     if (event.touches && event.touches.length > 0) {
         mouseX = event.touches[0].clientX;
         mouseY = event.touches[0].clientY;
     } else {
-        mouseX = event.clientX || 0;
-        mouseY = event.clientY || 0;
+        mouseX = event.clientX;
+        mouseY = event.clientY;
     }
 }
 
-function onMouseMove(event) {
+function handleMouseMove(event) {
     if (!isFirstPerson || !isDragging) return;
-    event.preventDefault();
     
     let clientX, clientY;
     if (event.touches && event.touches.length > 0) {
         clientX = event.touches[0].clientX;
         clientY = event.touches[0].clientY;
+        event.preventDefault();
     } else {
-        clientX = event.clientX || mouseX;
-        clientY = event.clientY || mouseY;
+        clientX = event.clientX;
+        clientY = event.clientY;
     }
     
     const deltaX = clientX - mouseX;
@@ -361,7 +345,7 @@ function onMouseMove(event) {
     mouseY = clientY;
 }
 
-function onMouseUp(event) {
+function handleMouseUp(event) {
     if (!isFirstPerson) return;
     isDragging = false;
     // Return to center
@@ -369,29 +353,11 @@ function onMouseUp(event) {
     targetRotationY = 0;
 }
 
-function onTouchMove(event) {
-    if (!isFirstPerson || !isDragging) return;
-    event.preventDefault();
-    
-    const touch = event.touches[0];
-    const deltaX = touch.clientX - mouseX;
-    const deltaY = touch.clientY - mouseY;
-    
-    targetRotationY += deltaX * 0.005;
-    targetRotationX += deltaY * 0.005;
-    
-    // Limit vertical rotation
-    targetRotationX = Math.max(-Math.PI/4, Math.min(Math.PI/4, targetRotationX));
-    
-    mouseX = touch.clientX;
-    mouseY = touch.clientY;
-}
-
 /**
  * Updates the camera position to follow the active car.
  */
 function updateCarCamera() {
-    if (activeCarIndex === -1 || cars.length === 0) return;
+    if (!isFirstPerson || activeCarIndex === -1 || cars.length === 0) return;
     
     const activeCar = cars[activeCarIndex].mesh;
     const direction = cars[activeCarIndex].direction;
